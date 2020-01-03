@@ -29,8 +29,6 @@ Category characters determine how the receiving application should interpret a p
 
 The RoBus protocol defines six categories by default. However, an application may define more categories when needed.
 
-See the packet category section for predefined category roles.
-
 ### Separator, Compound, End characters
 
 These configuration items define the utf-8 characters used in encoded packets. They may be changed to suit a users application if they meet the following rules:
@@ -67,7 +65,6 @@ The `_data` field is a heirachical structure of user defined data.
 Results in the following address mapping:
 
 | path                  | 16-bit address  | type                    |
-| ---:                  | :---            | ---                     |
 | *sensor*              | *0x8000*        | -                       |
 | *sensor/imu*          | *0x80A0*        | -                       | 
 | *sensor/imu/accel*    | *0x80A0*        | -                       |
@@ -108,5 +105,16 @@ For enumerations, the item names are user defined - these get encoded as integer
 
 
 
-# Encoding
+# Packets
 
+A typical packet is composed of a category character, an address, encoded data, and an end character.
+
+
+### Category
+The first character of a packet is always a category character. This specifies how the packet should be interpretted.
+
+RoBus defines the following catergories by default:
+
+* *set* sets a data value, a response of *nak* or *ack* are recommended (though optional)
+* *ack* and *nak* packets are solely for responding to *set* packets. They should contain the same address(es) as the *set* packet, but no payload data
+* *get* requests a data value once 
