@@ -42,7 +42,7 @@ These configuration items define the utf-8 characters used in encoded packets. T
 
 The `_data` field is a heirachical structure of user defined data.
  
-```
+```json
 "_data" : [
   { "sensor" : { "_addr": "8000", "_data": [
     { "imu": { "_addr": "00A0", "_data": [
