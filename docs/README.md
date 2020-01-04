@@ -1,5 +1,7 @@
 
-Packets are human interprettable/enterable: `S10C0:00:CF000000\n`
+Packets are human interprettable/enterable: 
+
+`S10C0:00:cf000000\n`
 
 The protocol is configured using a json file.
 
@@ -101,13 +103,21 @@ Valid types:
 * boolean: "bool"
 * enumeration: [ "item1", "item2", ...]
 
-For enumerations, the item names are user defined - these get encoded as integers.
-
+For enumerations, the item names are user defined - these get encoded as integers. An enumeration can have no more than 256 entries.
 
 
 # Packets
 
-A typical packet is composed of a category character, an address, encoded data, and an end character.
+A typical packet looks like:
+
+`S13e7:00:cf000000\n`
+
+Where:
+* `S` is the packet's category
+* `13e7` is a data address
+* `:` are item separation characters
+* `00:cf000000` is encoded payload data
+* `\n` is the packet's end character
 
 
 ### Category
@@ -127,6 +137,33 @@ It is not necessary that an application implements all categories (eg. *ack* and
 
 ### Address
 
+Addresses are encoded as a four character big-endian hexidecimal string.
 
+### Separators
+
+Separator characters go between addresses and data values. The default separator character is `:`
+
+### Data
+
+Encoding of data depends on the data type. All data gets encoded into some big endian hexidecimal string.
+Data typing is inferred from the address and configuration, it is not carried in the packet itself.
+
+| Type              | Encoding |
+| ---               | ---      |
+| Unsigned integers | 1 character per 4-bits, zero padded |
+| Signed integers   | 2's complement, 1 character per 4-bits, zero padded |
+| Float             | IEEE 754 binary 32, 8 characters |
+| Double            | IEEE 754 binary 64, 16 characters |
+| Bool              | Single character, only '0' or '1' is valid |
+| Enumeration       | 2 characters to represent an unsigned 8-bit integer - enumerations are limited to 256 values |
+
+### End
+
+Packets terminate with an end character. The default end character is `\n`.
+
+### Compound
+
+Instead of an end charactor, packets can be combined using a compound character. The purpose of a compound character is to ensure sets of data are processed together.
+The default compound character is `|`.
 
 
