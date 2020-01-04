@@ -65,25 +65,25 @@ The `_data` field is a heirachical structure of user defined data.
 Results in the following address mapping:
 
 | path                  | 16-bit address  | type                    |
+| ---                   | ---             | ---                     |
 | *sensor*              | *0x8000*        | -                       |
 | *sensor/imu*          | *0x80A0*        | -                       | 
-| *sensor/imu/accel*    | *0x80A0*        | -                       |
-| *sensor/imu/accel/x*  | *0x80A0*        | float                   |
-| *sensor/imu/accel/y*  | *0x80A1*        | float                   |
-| *sensor/imu/accel/z*  | *0x80A2*        | float                   |
-| *sensor/imu/gyros*    | *0x80A3*        | -                       |
-| *sensor/imu/gyros/x*  | *0x80A3*        | float                   |
-| *sensor/imu/gyros/y*  | *0x80A4*        | float                   |
-| *sensor/imu/gyros/z*  | *0x80A5*        | float                   |
+| *sensor/imu/accel*    | *0x80A1*        | -                       |
+| *sensor/imu/accel/x*  | *0x80A2*        | float                   |
+| *sensor/imu/accel/y*  | *0x80A3*        | float                   |
+| *sensor/imu/accel/z*  | *0x80A4*        | float                   |
+| *sensor/imu/gyros*    | *0x80A5*        | -                       |
+| *sensor/imu/gyros/x*  | *0x80A6*        | float                   |
+| *sensor/imu/gyros/y*  | *0x80A7*        | float                   |
+| *sensor/imu/gyros/z*  | *0x80A8*        | float                   |
 | *sensor/temperature*  | *0x80C0*        | float                   |
 | *sensor/barometer*    | *0x80C1*        | float                   |
 | *timestamp_ms*        | *0x9000*        | unsigned integer 64-bit |
 
 Addresses:
 * Addresses are always four character hexidecimal strings `/[0-9a-f]{4}/i`
-* Items inherit the address of the parent object and then adds thier own.
-* If an item does not define an address, it increments from the previous assigned address.
-* Parent items share thier address with thier first child
+* Items inherit the address of the parent object and then add thier own.
+* If an item does not define an address, it increments from the last assigned address.
 * Addresses must always increment (eg/ an address of 8000 following and address of C000 is invalid).
 * Addresses never exceed 16-bits.
 
@@ -115,6 +115,18 @@ The first character of a packet is always a category character. This specifies h
 
 RoBus defines the following catergories by default:
 
-* *set* sets a data value, a response of *nak* or *ack* are recommended (though optional)
-* *ack* and *nak* packets are solely for responding to *set* packets. They should contain the same address(es) as the *set* packet, but no payload data
-* *get* requests a data value once 
+| Category    | Default encoding | Description |
+| ---         | ---              | ---         |
+| *set*       | S                | Sets a data value, a response of *nak* or *ack* are recommended (though optional) |
+| *ack*/*nak* | A/N              | Responds to *set* packets. <br>They should contain the same address(es) as the *set* packet, but no payload data |
+| *get*       | G                | Requests a data value once, a response of *pub* with all contained data is expected.<br>   <ul><li>If the requested path has no children:<br> The response payload should contain only one item.<br> (eg: path *sensor/imu/accel/x* carries only one data item in the payload)</li><li>If the requested path has children:<br>The response payload should contain multiple items. <br> (e.g. path *sensor/imu* from above carries six items in the payload)</li></ul> |
+| *sub*       | B                | Is the same as *get* but expects the data to be sent continously <br> The publishing rate is at the discretion of the sending application. |
+| *pub*       | P                | Is used for sending application data values |
+
+It is not necessary that an application implements all categories (eg. *ack* and *nak* can easily be omitted in many cases)
+
+### Address
+
+
+
+
